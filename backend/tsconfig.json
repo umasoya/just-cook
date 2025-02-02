@@ -8,7 +8,6 @@
     "rootDir": "./src",                                  /* Specify the root folder within your source files. */
     "outDir": "./dist",
     "moduleResolution": "node",                     /* Specify how TypeScript looks up a file from a given module specifier. */
-    "include": ["./src/**/*"],
     "resolveJsonModule": true,                        /* Enable importing .json files. */
 
     /* Interop Constraints */
