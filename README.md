@@ -11,8 +11,55 @@ Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実�
 - フロントエンド: React + TypeScript
 - backend/ と frontend/ を同じリポジトリで管理する予定
 
-このブランチは再出発用の初期化。アプリ、依存関係、起動コマンドはまだ用意していない。
-DB、各ライブラリのバージョン、開発環境は初期セットアップ時に決める。
+現在は初期セットアップ中。Nixの開発環境は用意済みで、Rails・ReactのアプリとDBの起動設定はまだ作成していない。
+
+## 開発環境の方針
+
+- 各ツール・ライブラリは、導入時点の最新安定版を基本とする。互換性やNixでの提供状況によって別のバージョンを選ぶ場合は理由を記録する。
+- Nix FlakesでRuby・Node.jsなどの開発ツールを管理し、`nix develop` で開発環境に入る。
+- `flake.nix` と `flake.lock` をGit管理し、Nixの入力を固定する。更新は意図的に行う。
+- Rubyの依存ライブラリはBundler、フロントエンドの依存ライブラリはpnpmで管理し、それぞれのロックファイルで固定する。
+- PostgreSQLはDocker Composeで管理する。RailsとReactはNixの開発環境で実行する。PostgreSQLのバージョンは未選定。
+
+### 確認済みの開発ツール
+
+2026-11-05にユーザーの `x86_64-linux` 環境で確認したバージョン。
+
+| ツール | バージョン |
+| --- | --- |
+| Ruby | 4.0.9 |
+| Node.js | 26.13.0 |
+| pnpm | 12.9.0 |
+| Bundler | 4.0.20 |
+
+pnpmは、固定したnixpkgsで提供される12.9.0を採用する。公式最新版との差は許容し、Nixで一元管理することを優先する。
+Rails・GraphQL-Rubyのバージョンは未選定。
+
+### 開発環境への入り方
+
+Nixを導入し、`nix-command` と `flakes` を有効にしておく。現在の `flake.nix` は `x86_64-linux` 向け。
+PostgreSQLの実行には、別途DockerとDocker Composeが必要。
+
+```sh
+nix develop
+```
+
+環境内でツールを確認する。
+
+```sh
+ruby --version
+node --version
+pnpm --version
+bundle --version
+```
+
+シェルを開かずに確認する場合は、次を実行する。
+
+```sh
+nix develop --command sh -c 'ruby --version; node --version; pnpm --version; bundle --version'
+```
+
+PostgreSQLのバージョン選定とCompose設定、Rails・Reactの起動手順は、今後のセットアップで追加する。
 
 ## 最初に使える状態
 
