@@ -1,26 +1,57 @@
 # Just Cook
 
-## Overview
+![Just Cook](./assets/logo/logo.png)
 
-![logo](./assets/logo/logo.png)
+レシピを保存し、作る人数に合わせて材料の分量を計算する個人用Webアプリ。
+Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実装する。
 
-**Just Cook** allows users to easily adjust ingredient quantities based on the number of servings needed for their recipes.
+## 技術構成
 
-With Just Cook, users can input their desired serving size, and the application automatically recalculates and displays the appropriate ingredient measurements. This makes recipe preparation efficient and straightforward, allowing you to focus on cooking and enjoying your meal.
+- バックエンド: Ruby on Rails（APIモード）+ GraphQL-Ruby
+- フロントエンド: React + TypeScript
+- backend/ と frontend/ を同じリポジトリで管理する予定
 
-## Technology Stack
+このブランチは再出発用の初期化。アプリ、依存関係、起動コマンドはまだ用意していない。
+DB、各ライブラリのバージョン、開発環境は初期セットアップ時に決める。
 
-### Server Side
+## 最初に使える状態
 
-- node.js
-- Express
+普段作る3品を登録して、2人前から3人前などに変更し、調理中に使えること。
 
-### Frontend
+- レシピの一覧・詳細・登録・編集
+- レシピ名、基準人数、本文、任意の出典URLを保存
+- 本文はMarkdown文字列として保存。最初の入力UIはテキストエリア
+- 材料ごとに名前、数量、単位、表示順を保存
+- 作る人数を指定すると「元の数量 × 作る人数 ÷ 基準人数」を表示
+- 計算によって保存済みの基準人数・数量を書き換えない
+- 「少々」「適量」は数量を空にし、別の文字列項目として保存・表示する
+- 最初は比例計算の値を表示。材料ごとの自動丸めや味の調整は後から検討する
+- 基準人数と作る人数は正の整数。数量は非負の小数を扱う
 
-- React
-- typescript
+画像アップロード、URLからの自動取り込み、リッチテキスト編集、認証、公開・共有は初期範囲に含めない。
+認証前はローカルで個人利用する。
 
-### Mobile
+## データの見取り図（実装前の案）
 
-- React Native
-- Expo
+- Recipe: title, base_servings, body, source_url
+- RecipeIngredient: recipe_id, name, quantity（decimal・任意）, unit, quantity_text（任意）, position
+- Recipe は複数の RecipeIngredient を持つ
+- 材料の数量は数値か「少々」などの文字列のどちらかを指定する
+
+## 実装する順序
+
+1. RailsとReactを起動し、GraphQLの小さなQueryを画面に表示する
+2. 名前と本文だけのレシピを1件保存し、詳細画面で取得する
+3. 材料を複数登録し、レシピと一緒に取得する
+4. 作る人数をQueryに渡し、バックエンドで計算した分量を画面に出す
+5. 一覧・編集・入力エラーの表示を整え、3品で実際に使う
+
+各段階で、画面 → GraphQL → Rails → DB の流れを自分の言葉で説明してから進む。
+AIは実装前の説明、ヒント、エラーの分析、差分レビューにも使い、一度の変更を小さくする。
+
+## ロゴと履歴
+
+assets/logo/logo.png と assets/logo/logo.svg は既存のものを保持する。
+旧Expressバックエンド、Reactの雛形、mobileディレクトリは初期化対象。
+以前のコードはGit履歴から参照できる。
+
