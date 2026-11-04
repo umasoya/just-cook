@@ -3,19 +3,46 @@ prefix_rule(
     decision = "allow",
 )
 prefix_rule(
-    pattern = ["gh","issue","view"],
+    pattern = ["gh",["issue","pr"],"view"],
     decision = "allow",
+    match = [
+        "gh issue view 1",
+        "gh pr view 1",
+    ],
+    not_match = [
+        "gh issue create --title 'This is Example'"
+        "gh pr create --title 'This is Example'"
+    ]
 )
 prefix_rule(
-    pattern = ["gh","pr","view"],
+    pattern = ["git",[["status","diff","log"]],
     decision = "allow",
+    match = [
+        "git status",
+        "git diff",
+        "git log origin/main main"
+    ],
+    not_match = [
+        "git commit -m 'message'",
+    ]
 )
 prefix_rule(
-    pattern = ["git","status"],
-    decision = "allow",
+    pattern = ["git", "push", ["-f", "--force","--force-with-lease", "--force-if-includes"]],
+    decision = "forbidden",
 )
 prefix_rule(
-    pattern = ["git","diff"],
-    decision = "allow",
+    pattern = ["git","push"],
+    decision = "prompt",
+    match = [
+        "git push origin develop"
+    ]
+)
+prefix_rule(
+    pattern = ["rm", ["-f","--force","-rf"]],
+    decision = "forbidden",
+    match = [
+        "rm -rf node_modules",
+        "rm -f .env"
+    ]
 )
 
