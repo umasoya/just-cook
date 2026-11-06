@@ -35,7 +35,8 @@ Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実�
 | Bundler | 4.0.20 |
 
 pnpmは、固定したnixpkgsで提供される12.9.0を採用する。公式最新版との差は許容し、Nixで一元管理することを優先する。
-Railsは最新安定版の8.1.4.1を採用する（[公式リリース](https://rubyonrails.org/2026/11/4/Rails-8.0.5.2-and-8.1.4.1-have-been-released)）。Rubyの要求バージョンは3.2.0以上で、使用中の4.0.9はその条件を満たす。GraphQL-Rubyのバージョンは未選定。
+Railsは最新安定版の8.1.4.1を採用する（[公式リリース](https://rubyonrails.org/2026/11/4/Rails-8.0.5.2-and-8.1.4.1-have-been-released)）。Rubyの要求バージョンは3.2.0以上で、使用中の4.0.9はその条件を満たす。
+GraphQL-Rubyは最新安定版の[2.6.14](https://rubygems.org/gems/graphql/versions/2.6.14)を採用する。Rubyの要求バージョンは2.7.0以上で、[gemの定義](https://github.com/rmosolgo/graphql-ruby/blob/v2.6.14/graphql.gemspec)にRailsのバージョン制約はない。アプリへの導入とRails 8.1.4.1上での動作確認は、GraphQLの実装段階で行う。
 
 ### 開発環境への入り方
 
