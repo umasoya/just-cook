@@ -11,7 +11,7 @@ Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実�
 - フロントエンド: React + TypeScript
 - backend/ と frontend/ を同じリポジトリで管理する予定
 
-現在は初期セットアップ中。Nixの開発環境は用意済みで、Rails・ReactのアプリとDBの起動設定はまだ作成していない。
+現在は初期セットアップ中。Nixの開発環境、PostgreSQLのCompose設定、`backend/` のRails APIアプリの雛形は用意済み。Railsの依存関係のインストールとDB接続設定、Reactアプリの作成はこれから行う。
 
 ## 開発環境の方針
 
@@ -19,7 +19,9 @@ Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実�
 - Nix FlakesでRuby・Node.jsなどの開発ツールを管理し、`nix develop` で開発環境に入る。
 - `flake.nix` と `flake.lock` をGit管理し、Nixの入力を固定する。更新は意図的に行う。
 - Rubyの依存ライブラリはBundler、フロントエンドの依存ライブラリはpnpmで管理し、それぞれのロックファイルで固定する。
-- PostgreSQLはDocker Composeで管理する。RailsとReactはNixの開発環境で実行する。PostgreSQLのバージョンは未選定。
+- PostgreSQLはDocker Composeで管理し、18.6を採用する。RailsとReactはNixの開発環境で実行する。
+- PostgreSQLは2026-11-06に[公式のバージョン一覧](https://www.postgresql.org/support/versioning/)で最新安定版が18.6であることを確認した。
+- DBのユーザー名・DB名の既定値は `just_cook`。接続先は `127.0.0.1:5432`（PC側のポートは `POSTGRES_PORT` で変更可能）。データは名前付きボリューム `postgres_data` に保存する。
 
 ### 確認済みの開発ツール
 
@@ -33,7 +35,7 @@ Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実�
 | Bundler | 4.0.20 |
 
 pnpmは、固定したnixpkgsで提供される12.9.0を採用する。公式最新版との差は許容し、Nixで一元管理することを優先する。
-Rails・GraphQL-Rubyのバージョンは未選定。
+Railsは最新安定版の8.1.4.1を採用する（[公式リリース](https://rubyonrails.org/2026/11/4/Rails-8.0.5.2-and-8.1.4.1-have-been-released)）。Rubyの要求バージョンは3.2.0以上で、使用中の4.0.9はその条件を満たす。GraphQL-Rubyのバージョンは未選定。
 
 ### 開発環境への入り方
 
@@ -59,7 +61,14 @@ bundle --version
 nix develop --command sh -c 'ruby --version; node --version; pnpm --version; bundle --version'
 ```
 
-PostgreSQLのバージョン選定とCompose設定、Rails・Reactの起動手順は、今後のセットアップで追加する。
+PostgreSQLをバックグラウンドで起動し、状態を確認する。
+
+```sh
+docker compose up -d db
+docker compose ps
+```
+
+Rails・Reactの起動手順は、今後のセットアップで追加する。
 
 ## 最初に使える状態
 
