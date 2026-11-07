@@ -1,6 +1,8 @@
 node_modules
 **/dist
 .serena/
+/.env
+/.direnv/
 
 # Rails secrets and local runtime files
 /backend/config/master.key

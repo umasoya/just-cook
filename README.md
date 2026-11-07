@@ -11,7 +11,7 @@ Rails + GraphQL + React + TypeScriptを、機能ごとに理解しながら実�
 - フロントエンド: React + TypeScript
 - backend/ と frontend/ を同じリポジトリで管理する予定
 
-現在は初期セットアップ中。Nixの開発環境、PostgreSQLのCompose設定、`backend/` のRails APIアプリの雛形は用意済み。Railsの依存関係のインストールとDB接続設定、Reactアプリの作成はこれから行う。
+現在は初期セットアップ中。Nixの開発環境、PostgreSQLのCompose設定、`backend/` のRails APIアプリの雛形は用意済み。Railsの依存関係のインストール、direnvからの環境変数の引き継ぎ、Railsからの開発用・テスト用DBの作成、Railsサーバーの起動とブラウザでの `/up` の表示は確認済み。Reactアプリの作成はこれから行う。
 
 ## 開発環境の方針
 
@@ -69,7 +69,78 @@ docker compose up -d db
 docker compose ps
 ```
 
-Rails・Reactの起動手順は、今後のセットアップで追加する。
+Reactの起動手順は、今後のセットアップで追加する。
+
+### direnvでローカルの環境変数を読み込む
+
+direnvでリポジトリ直下の `.env` を読み込み、RailsとDocker Composeに同じ `POSTGRES_PASSWORD` を渡す。Nixの開発環境には、引き続き `nix develop` で入る。
+
+1. `direnv --version` でインストールを確認する。未導入の場合は普段の環境管理方法でdirenvを導入する。zshでは `~/.zshrc` の末尾に次を設定し、シェルを開き直す。すでに設定済みなら追加は不要。
+
+   ```sh
+   eval "$(direnv hook zsh)"
+   ```
+
+2. リポジトリ直下の `.gitignore` に次を追加する。既存の `/backend/.env*` は、リポジトリ直下の `.env` を除外しない。
+
+   ```gitignore
+   /.env
+   /.direnv/
+   ```
+
+3. リポジトリ直下に `.env` を作成する。以下の値は実際のローカルDBのパスワードに置き換える。`.env` はコミットしない。
+
+   ```dotenv
+   POSTGRES_PASSWORD='ローカルDBのパスワード'
+   ```
+
+   既存のDBをComposeの既定値で初期化済みなら、そのパスワードを設定する。既存のデータボリュームがある場合、環境変数を変更してもDB内のパスワードは変更されない。
+
+4. リポジトリ直下に `.envrc` を作成する。こちらには秘密情報を書かず、読み込み処理だけを記載する。
+
+   ```sh
+   dotenv .env
+   ```
+
+5. リポジトリ直下で読み込みを許可し、パスワードの値を表示せずに確認する。
+
+   ```sh
+   direnv allow
+   test -n "$POSTGRES_PASSWORD" && echo 'POSTGRES_PASSWORD is set'
+   git check-ignore .env
+   ```
+
+   `.env` と表示されればGitの除外設定が有効。`.envrc` を編集した場合は、再度 `direnv allow` を実行する。
+
+6. 同じシェルで `nix develop` に入り、リポジトリ直下で `docker compose up -d db` を実行する。`backend/` に移動して実行するRailsにも、環境変数が引き継がれる。`database.yml` は `ENV["POSTGRES_PASSWORD"]` からパスワードを読む。
+
+参考: [direnvのシェル設定](https://direnv.net/docs/hook.html)、[dotenvの公式仕様](https://direnv.net/man/direnv-stdlib.1.html)。direnvからNixの開発環境への環境変数の引き継ぎは、ユーザー環境で確認済み。
+
+### RailsのDB作成と起動確認
+
+direnvで環境変数を読み込み、Nixの開発環境とPostgreSQLを起動した状態で実行する。
+
+```sh
+cd backend
+bundle install
+bin/rails db:create
+```
+
+ユーザー環境で `Created database 'backend_development'` と `Created database 'backend_test'` の出力を確認済み。`db:create` はDBそのものを作成する。テーブルの作成・変更はmigrationで行う。
+
+次にRailsサーバーを起動する。
+
+```sh
+bin/rails server
+```
+
+別のターミナルでヘルスチェックを呼び出す。
+
+```sh
+curl -i http://localhost:3000/up
+```
+
+HTTP 200が返ることを確認する。ブラウザで http://localhost:3000/up を開いて緑色の画面を確認することもできる。ユーザー環境でRailsサーバーの起動とブラウザでの表示を確認済み。終了はサーバーを起動したターミナルで `Ctrl+C`。`/up` はアプリの起動確認用で、DB接続を確認するエンドポイントではない。
 
 ## 最初に使える状態
 

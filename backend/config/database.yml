@@ -15,6 +15,10 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  host: 127.0.0.1
+  port: 5432
+  username: just_cook
+  password: <%= ENV["POSTGRES_PASSWORD"].to_json %>
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
